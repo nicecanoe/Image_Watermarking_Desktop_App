@@ -1,8 +1,9 @@
 # import Pillow
 import tkinter
-from tkinter import filedialog
+from tkinter import filedialog,messagebox, simpledialog
 from PIL import ImageTk, Image, ImageGrab
-import time
+import os
+
 
 
 
@@ -21,15 +22,23 @@ def treat_image():
     #第一设定后，后续要更改时使用canvas.coords(canvas_img, new_x, new_y)
     canvas.coords(canvas_img, img_width/2, img_height/2)
     canvas.itemconfig(canvas_img,image=img)
-#开始做水印
-    canvas.coords(canvas_title,img_width, img_height)
-    windows.update()
-#储存图片
-    canvas.postscript(file="canvas.ps", colormode='color')
 
+
+#开始做水印
+def watermark_image():
+    user_input = simpledialog.askstring("input","Enter your watermark")
+    canvas.itemconfig(canvas_title,text=user_input)
+    canvas.coords(canvas_title,img_width, img_height)
+    windows.update(canvas_title,text="")
+
+
+#储存图片
+def save_image():
+    canvas.postscript(file="canvas.ps", colormode='color')
     img_save = Image.open("canvas.ps")
     img_save.save("canvas.png", 'png')
-
+    messagebox.showinfo("Image save", "Watermaking Completed")
+    os.system('start canvas.png')
 
 
 
@@ -55,9 +64,16 @@ canvas_img = canvas.create_image(img_width/2, img_height/2,image=img)
 canvas_title = canvas.create_text(img_width, img_height, text="Copyright © 2024 yangweili. All rights reserved.",
                                   font=("Courier", 16), anchor="se", fill="white")
 
-canvas.grid(row=1, column=1)
+canvas.grid(row=1, column=0,columnspan=3)
 
 the_upload_button = tkinter.Button(text="upload the image", command=treat_image,width=20,height=2)
-the_upload_button.grid(row=2, column=1)
+the_upload_button.grid(row=2, column=0)
+
+the_watermake_button = tkinter.Button(text="watermaking", command=watermark_image,width=20,height=2)
+the_watermake_button.grid(row=2, column=1)
+
+the_save_button = tkinter.Button(text="save the img", command=save_image,width=20,height=2)
+the_save_button.grid(row=2, column=2)
+
 
 windows.mainloop()
